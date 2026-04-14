@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InflaciónMérida · Cesta Básica</title>
+  <meta name="description" content="Seguimiento diario de precios de la cesta básica en Mérida usando datos reales de Mercadona. Gráficas históricas, buscador y índice semanal." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ── TOKENS — identidad Mérida XYZ (light editorial) ── */
+    :root {
+      --clr-bg:         #f7f7f5;
+      --clr-surface:    #ffffff;
+      --clr-border:     #e5e5e3;
+      --clr-border-lt:  #f0f0ee;
+      --clr-text:       #111111;
+      --clr-text-mid:   #444444;
+      --clr-text-muted: #888888;
+      --clr-accent:     #1a1a1a;
+      --clr-accent2:    #2563eb;      /* azul suave para datos */
+      --clr-up:         #dc2626;
+      --clr-down:       #16a34a;
+      --radius:         4px;
+      --radius-md:      8px;
+      --shadow:         0 1px 4px rgba(0,0,0,.07), 0 0 1px rgba(0,0,0,.06);
+      --shadow-md:      0 4px 16px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.05);
+      --transition:     .18s ease;
+      --max-w:          1100px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: var(--clr-surface);
+      border-bottom: 1px solid var(--clr-border);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+
+    .header-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .site-brand {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      line-height: 1.15;
+    }
+
+    .brand-sup {
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+    }
+
+    .brand-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--clr-text);
+      letter-spacing: -.01em;
+    }
+
+    .brand-name span { color: var(--clr-accent2); }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-left: auto;
+    }
+
+    .header-nav a {
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--clr-text-muted);
+      text-decoration: none;
+      transition: color var(--transition);
+      letter-spacing: .02em;
+    }
+
+    .header-nav a:hover { color: var(--clr-text); }
+
+    .badge-live {
+      font-size: .65rem;
+      font-weight: 700;
+      background: #111;
+      color: #fff;
+      padding: .2rem .55rem;
+      border-radius: 3px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ── HERO STRIP ── */
+    .hero-strip {
+      border-bottom: 1px solid var(--clr-border);
+      background: var(--clr-surface);
+      padding: 2.5rem 1.5rem 2rem;
+    }
+
+    .hero-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+      margin-bottom: .5rem;
+    }
+
+    .hero-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--clr-text);
+      line-height: 1.15;
+      margin-bottom: .6rem;
+    }
+
+    .hero-title em {
+      font-style: normal;
+      color: var(--clr-accent2);
+    }
+
+    .hero-subtitle {
+      font-size: .9rem;
+      color: var(--clr-text-muted);
+      max-width: 580px;
+      line-height: 1.7;
+    }
+
+    /* ── KPI ROW ── */
+    .kpi-row {
+      background: var(--clr-bg);
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    .kpi-row-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      gap: 0;
+    }
+
+    .kpi-item {
+      flex: 1;
+      padding: 1.25rem 1.5rem;
+      border-right: 1px solid var(--clr-border);
+    }
+
+    .kpi-item:last-child { border-right: none; }
+
+    .kpi-label {
+      font-size: .67rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--clr-text-muted);
+      margin-bottom: .25rem;
+    }
+
+    .kpi-value {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--clr-text);
+      line-height: 1;
+    }
+
+    .kpi-sub {
+      font-size: .7rem;
+      color: var(--clr-text-muted);
+      margin-top: .2rem;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: .65rem;
+      border-bottom: 2px solid var(--clr-text);
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      text-transform: uppercase;
+      color: var(--clr-text);
+    }
+
+    .section-meta {
+      font-size: .72rem;
+      color: var(--clr-text-muted);
+      font-weight: 500;
+    }
+
+    /* ── BASKET GRID ── */
+    .basket-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 1px;
+      background: var(--clr-border);
+      border: 1px solid var(--clr-border);
+    }
+
+    .basket-item {
+      background: var(--clr-surface);
+      padding: .85rem 1rem;
+      cursor: pointer;
+      transition: background var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: .15rem;
+    }
+
+    .basket-item:hover { background: #fafaf8; }
+
+    .basket-item-cat {
+      font-size: .6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--clr-text-muted);
+    }
+
+    .basket-item-name {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--clr-text);
+      line-height: 1.3;
+    }
+
+    .basket-item-price {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--clr-text);
+      margin-top: .25rem;
+      letter-spacing: -.01em;
+    }
+
+    .basket-item-change {
+      font-size: .7rem;
+      font-weight: 600;
+    }
+
+    .change-up   { color: var(--clr-up); }
+    .change-down { color: var(--clr-down); }
+    .change-flat { color: var(--clr-text-muted); }
+
+    /* ── BASKET TOTAL ── */
+    .basket-total {
+      margin-top: 1px;
+      background: var(--clr-text);
+      color: #fff;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .basket-total-label {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .75;
+    }
+
+    .basket-total-right {
+      display: flex;
+      align-items: baseline;
+      gap: .75rem;
+    }
+
+    .basket-total-amount {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .basket-total-diff {
+      font-size: .75rem;
+      font-weight: 700;
+      padding: .15rem .5rem;
+      border-radius: 3px;
+    }
+
+    .diff-up   { background: rgba(220,38,38,.25); color: #fca5a5; }
+    .diff-down { background: rgba(22,163,74,.25);  color: #86efac; }
+    .diff-flat { background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); }
+
+    /* ── SEARCH ── */
+    .search-wrap { position: relative; }
+
+    .search-icon {
+      position: absolute;
+      left: .875rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--clr-text-muted);
+      font-size: .9rem;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: .75rem .875rem .75rem 2.5rem;
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      background: var(--clr-surface);
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      color: var(--clr-text);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: var(--clr-text);
+      box-shadow: 0 0 0 3px rgba(0,0,0,.06);
+    }
+
+    #searchInput::placeholder { color: var(--clr-text-muted); }
+
+    /* ── CHART SECTION ── */
+    .chart-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--clr-border-lt);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+
+    .chart-card-title {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--clr-text-muted);
+    }
+
+    .select-wrap { position: relative; }
+
+    #productSelect {
+      appearance: none;
+      background: var(--clr-bg);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      padding: .45rem 2rem .45rem .75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--clr-text);
+      cursor: pointer;
+      transition: border-color var(--transition);
+    }
+
+    #productSelect:focus { outline: none; border-color: var(--clr-text); }
+
+    .select-arrow {
+      position: absolute;
+      right: .6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: .6rem;
+      color: var(--clr-text-muted);
+    }
+
+    .chart-body { padding: 1.25rem; }
+    .chart-container { height: 260px; position: relative; }
+
+    /* ── TABLE ── */
+    .table-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .products-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .products-table th {
+      padding: .65rem 1rem;
+      text-align: left;
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--clr-text-muted);
+      background: var(--clr-bg);
+      border-bottom: 1px solid var(--clr-border);
+      white-space: nowrap;
+    }
+
+    .products-table td {
+      padding: .75rem 1rem;
+      font-size: .82rem;
+      border-bottom: 1px solid var(--clr-border-lt);
+      vertical-align: middle;
+    }
+
+    .products-table tr:last-child td { border-bottom: none; }
+
+    .products-table tbody tr {
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .products-table tbody tr:hover { background: #fafaf8; }
+
+    .td-nombre { font-weight: 600; color: var(--clr-text); }
+
+    .cat-tag {
+      display: inline-block;
+      font-size: .62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      padding: .15rem .45rem;
+      border-radius: 3px;
+      background: #f0f0ee;
+      color: var(--clr-text-muted);
+    }
+
+    .td-price {
+      font-weight: 800;
+      font-size: .9rem;
+      color: var(--clr-text);
+      white-space: nowrap;
+    }
+
+    .td-unit { color: var(--clr-text-muted); font-size: .75rem; }
+
+    .diff-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .15rem;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .15rem .45rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .diff-badge.up   { background: #fee2e2; color: var(--clr-up); }
+    .diff-badge.down { background: #dcfce7; color: var(--clr-down); }
+    .diff-badge.flat { background: #f0f0ee; color: var(--clr-text-muted); }
+
+    .btn-chart {
+      font-size: .72rem;
+      font-weight: 600;
+      padding: .3rem .65rem;
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--clr-text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-chart:hover {
+      border-color: var(--clr-text);
+      color: var(--clr-text);
+      background: var(--clr-bg);
+    }
+
+    /* ── EMPTY / LOADING ── */
+    .state-box {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--clr-text-muted);
+    }
+
+    .spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--clr-border);
+      border-top-color: var(--clr-text);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto .75rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .state-title { font-size: .9rem; font-weight: 600; margin-bottom: .3rem; color: var(--clr-text); }
+    .state-desc  { font-size: .8rem; }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      border-top: 1px solid var(--clr-border);
+      background: var(--clr-surface);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      font-size: .75rem;
+      color: var(--clr-text-muted);
+    }
+
+    .footer-inner a {
+      color: var(--clr-text-muted);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-inner a:hover { color: var(--clr-text); }
+
+    .footer-sep { margin: 0 .4rem; opacity: .4; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .kpi-row-inner { flex-wrap: wrap; }
+      .kpi-item { flex: 1 1 50%; border-bottom: 1px solid var(--clr-border); }
+      .basket-grid { grid-template-columns: 1fr 1fr; }
+      .products-table th:nth-child(4),
+      .products-table td:nth-child(4),
+      .products-table th:last-child,
+      .products-table td:last-child { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .header-inner { padding: 0 1rem; }
+      .main { padding: 1.5rem 1rem; }
+      .hero-strip { padding: 2rem 1rem 1.5rem; }
+      .basket-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-in { animation: fadeIn .35s ease both; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="https://meridaxyz.wordpress.com" class="site-brand">
+      <span class="brand-sup">Mérida XYZ</span>
+      <span class="brand-name">Inflación<em>Mérida</em></span>
+    </a>
+    <nav class="header-nav">
+      <a href="https://fud0dev.github.io/AgendaMerida/" target="_blank" rel="noopener">Agenda</a>
+      <a href="https://fud0dev.github.io/ADMerida/" target="_blank" rel="noopener">AD Mérida</a>
+      <a href="https://fud0dev.github.io/EmpleoMerida/" target="_blank" rel="noopener">Empleo</a>
+      <span class="badge-live" id="lastUpdateBadge">Cargando…</span>
+    </nav>
+  </div>
+</header>
+
+<!-- ── HERO ── -->
+<section class="hero-strip">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Portal de datos · Economía doméstica</p>
+    <h1 class="hero-title">Cesta Básica en <em>Mérida</em></h1>
+    <p class="hero-subtitle">Seguimiento diario de precios en Mercadona. Datos reales actualizados automáticamente cada mañana.</p>
+  </div>
+</section>
+
+<!-- ── KPI ROW ── -->
+<div class="kpi-row">
+  <div class="kpi-row-inner">
+    <div class="kpi-item">
+      <div class="kpi-label">Cesta básica</div>
+      <div class="kpi-value" id="kpiTotal">—</div>
+      <div class="kpi-sub">precio total hoy</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Productos</div>
+      <div class="kpi-value" id="kpiProductos">—</div>
+      <div class="kpi-sub">monitorizados</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Días registrados</div>
+      <div class="kpi-value" id="kpiRegistros">—</div>
+      <div class="kpi-sub">en histórico</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label">Variación semanal</div>
+      <div class="kpi-value" id="kpiVariacion">—</div>
+      <div class="kpi-sub">vs primera fecha</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- CESTA BÁSICA -->
+  <section class="fade-in">
+    <div class="section-header">
+      <h2 class="section-title">Índice Cesta Básica</h2>
+      <span class="section-meta" id="cestoFecha">—</span>
+    </div>
+    <div id="basketGrid" class="basket-grid">
+      <div class="state-box" style="background:#fff">
+        <div class="spinner"></div>
+        <div class="state-title">Cargando datos…</div>
+      </div>
+    </div>
+    <div class="basket-total" id="basketTotal" style="display:none">
+      <span class="basket-total-label">Total cesta básica</span>
+      <div class="basket-total-right">
+        <span class="basket-total-amount" id="basketTotalAmt">—</span>
+        <span class="basket-total-diff diff-flat" id="basketTotalDiff">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUSCADOR -->
+  <section class="fade-in">
+    <div class="section-header">
+      <h2 class="section-title">Buscar producto</h2>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre o categoría… (ej: aceite, leche, arroz)" autocomplete="off" />
+    </div>
+  </section>
+
+  <!-- GRÁFICA -->
+  <section class="fade-in">
+    <div class="section-header">
+      <h2 class="section-title">Evolución de precio</h2>
+      <span class="section-meta">Selecciona un producto para ver su historial</span>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title" id="chartProductName">—</span>
+        <div class="select-wrap">
+          <select id="productSelect">
+            <option value="">— Elige un producto —</option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div class="chart-container">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLA -->
+  <section class="fade-in">
+    <div class="section-header">
+      <h2 class="section-title">Todos los productos</h2>
+      <span class="section-meta" id="tableCount">—</span>
+    </div>
+    <div class="table-card">
+      <div id="tableContainer">
+        <div class="state-box">
+          <div class="spinner"></div>
+          <div class="state-title">Cargando tabla…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>
+      <strong>InflaciónMérida</strong>
+      <span class="footer-sep">·</span>
+      Datos extraídos de Mercadona
+      <span class="footer-sep">·</span>
+      Actualización diaria automática
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/fud0dev" target="_blank" rel="noopener">GitHub @fud0dev</a>
+      <span class="footer-sep">·</span>
+      <a href="https://meridaxyz.wordpress.com" target="_blank" rel="noopener">Mérida XYZ</a>
+    </p>
+    <p style="margin-top:.35rem;opacity:.6">© 2026 Mérida XYZ Portal Informativo · Proyecto independiente, no afiliado a Mercadona.</p>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   InflaciónMérida · Frontend JS
+   Lee data/historico_completo.json y construye la UI.
+═══════════════════════════════════════════════════════ */
+
+const CESTA_KEYWORDS = [
+  "leche entera", "leche semidesnatada", "leche desnatada",
+  "yogur natural", "mantequilla", "queso tierno",
+  "huevos",
+  "pechuga", "contramuslo", "carne picada", "lomo de cerdo",
+  "merluza", "atún", "sardinas", "mejillones",
+  "manzana", "pera", "mandarina", "plátano", "naranja",
+  "tomate", "patata", "cebolla", "zanahoria", "lechuga", "judías", "pimiento",
+  "pan de molde", "pan integral",
+  "aceite de oliva", "aceite de girasol",
+  "arroz", "macarrones", "espaguetis", "lentejas", "garbanzos", "alubias",
+  "tomate frito", "tomate triturado",
+  "azúcar", "sal fina", "harina",
+  "agua mineral",
+];
+
+let state = {
+  historico: null,
+  fechaActual: null,
+  fechaAnterior: null,
+  productosActuales: [],
+  productosAnteriores: [],
+  chart: null,
+};
+
+// ── LOAD ──────────────────────────────────────────────
+async function loadData() {
+  try {
+    const r = await fetch(`data/historico_completo.json?_=${Date.now()}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    state.historico = await r.json();
+
+    const fechas = state.historico.fechas;
+    if (!fechas?.length) throw new Error("Sin fechas");
+
+    state.fechaActual    = fechas[fechas.length - 1];
+    state.fechaAnterior  = fechas.length > 1 ? fechas[fechas.length - 2] : null;
+    state.productosActuales   = state.historico.datos[state.fechaActual]  || [];
+    state.productosAnteriores = state.fechaAnterior
+      ? (state.historico.datos[state.fechaAnterior] || []) : [];
+
+    renderAll();
+  } catch (e) {
+    console.error(e);
+    renderError();
+  }
+}
+
+// ── RENDER ALL ────────────────────────────────────────
+function renderAll() {
+  renderKPIs();
+  renderBasket();
+  renderTable(state.productosActuales);
+  populateSelector();
+  if (state.productosActuales[0]) renderChart(state.productosActuales[0].nombre);
+}
+
+// ── KPIs ──────────────────────────────────────────────
+function renderKPIs() {
+  const fechas = state.historico.fechas;
+
+  document.getElementById("lastUpdateBadge").textContent =
+    `Actualizado ${fmt(state.fechaActual)}`;
+
+  document.getElementById("kpiProductos").textContent =
+    state.productosActuales.length;
+
+  document.getElementById("kpiRegistros").textContent = fechas.length;
+
+  const totalHoy = cestaTotal(state.productosActuales);
+  document.getElementById("kpiTotal").textContent =
+    totalHoy ? `${totalHoy.toFixed(2)} €` : "—";
+
+  if (fechas.length > 1) {
+    const primeroData  = state.historico.datos[fechas[0]] || [];
+    const totalPrimero = cestaTotal(primeroData);
+    const diff         = totalHoy - totalPrimero;
+    document.getElementById("kpiVariacion").textContent =
+      `${diff > 0 ? "+" : ""}${diff.toFixed(2)} €`;
+    document.getElementById("kpiVariacion").style.color =
+      diff > 0 ? "var(--clr-up)" : diff < 0 ? "var(--clr-down)" : "inherit";
+  } else {
+    document.getElementById("kpiVariacion").textContent = "—";
+  }
+}
+
+// ── BASKET ────────────────────────────────────────────
+function cestaTotal(productos) {
+  let total = 0;
+  const seen = new Set();
+  for (const kw of CESTA_KEYWORDS) {
+    const p = productos.find(x => nf(x.nombre).includes(nf(kw)));
+    if (p && !seen.has(p.nombre)) { total += p.precio; seen.add(p.nombre); }
+  }
+  return total;
+}
+
+function renderBasket() {
+  const grid = document.getElementById("basketGrid");
+  const totalEl  = document.getElementById("basketTotal");
+  const totalAmt = document.getElementById("basketTotalAmt");
+  const totalDiff = document.getElementById("basketTotalDiff");
+
+  document.getElementById("cestoFecha").textContent = fmt(state.fechaActual);
+
+  const items = [];
+  const seen  = new Set();
+
+  for (const kw of CESTA_KEYWORDS) {
+    const pAct = state.productosActuales.find(x => nf(x.nombre).includes(nf(kw)));
+    if (!pAct || seen.has(pAct.nombre)) continue;
+    seen.add(pAct.nombre);
+
+    const pAnt = state.productosAnteriores.find(x => nf(x.nombre) === nf(pAct.nombre));
+    const diff = pAnt ? pAct.precio - pAnt.precio : 0;
+
+    let changeHtml = "";
+    if (Math.abs(diff) >= 0.001) {
+      const cls = diff > 0 ? "change-up" : "change-down";
+      const sym = diff > 0 ? "▲" : "▼";
+      changeHtml = `<span class="basket-item-change ${cls}">${sym} ${Math.abs(diff).toFixed(2)} €</span>`;
+    }
+
+    items.push(`
+      <div class="basket-item" onclick="selectProduct('${escH(pAct.nombre)}')">
+        <span class="basket-item-cat">${escH(pAct.categoria || "")}</span>
+        <span class="basket-item-name">${escH(pAct.nombre)}</span>
+        <span class="basket-item-price">${pAct.precio.toFixed(2)} €</span>
+        ${changeHtml}
+      </div>`);
+  }
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="state-box" style="background:#fff;grid-column:1/-1">
+      <div class="state-title">Sin datos de cesta</div>
+      <div class="state-desc">Ejecuta el scraper primero.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.join("");
+
+  const totalHoy = cestaTotal(state.productosActuales);
+  const totalAnt = state.fechaAnterior ? cestaTotal(state.productosAnteriores) : null;
+  const d = totalAnt !== null ? totalHoy - totalAnt : 0;
+
+  totalEl.style.display = "flex";
+  totalAmt.textContent  = `${totalHoy.toFixed(2)} €`;
+
+  if (totalAnt === null || Math.abs(d) < 0.001) {
+    totalDiff.textContent = "Sin comparativa";
+    totalDiff.className   = "basket-total-diff diff-flat";
+  } else if (d > 0) {
+    totalDiff.textContent = `▲ +${d.toFixed(2)} € vs ayer`;
+    totalDiff.className   = "basket-total-diff diff-up";
+  } else {
+    totalDiff.textContent = `▼ ${d.toFixed(2)} € vs ayer`;
+    totalDiff.className   = "basket-total-diff diff-down";
+  }
+}
+
+// ── TABLE ─────────────────────────────────────────────
+function renderTable(productos) {
+  const container = document.getElementById("tableContainer");
+  document.getElementById("tableCount").textContent =
+    `${productos.length} productos`;
+
+  if (!productos.length) {
+    container.innerHTML = `<div class="state-box">
+      <div class="state-title">Sin resultados</div>
+      <div class="state-desc">Prueba otro término de búsqueda.</div></div>`;
+    return;
+  }
+
+  const rows = productos.map(p => {
+    const pAnt  = state.productosAnteriores.find(x => nf(x.nombre) === nf(p.nombre));
+    const diff  = pAnt ? p.precio - pAnt.precio : null;
+    const badge = diff === null ? "" : diffBadge(diff);
+    const unit  = p.precio_por_unidad
+      ? `${parseFloat(p.precio_por_unidad).toFixed(2)} €/${p.unidad_medida || ""}`
+      : "—";
+
+    return `<tr onclick="selectProduct('${escH(p.nombre)}')">
+      <td class="td-nombre">${escH(p.nombre)}</td>
+      <td><span class="cat-tag">${escH(p.categoria || "—")}</span></td>
+      <td class="td-price">${p.precio.toFixed(2)} €</td>
+      <td class="td-unit">${unit}</td>
+      <td>${badge || '<span class="diff-badge flat">—</span>'}</td>
+      <td><button class="btn-chart" onclick="event.stopPropagation();selectProduct('${escH(p.nombre)}')">Ver gráfica</button></td>
+    </tr>`;
+  });
+
+  container.innerHTML = `
+    <table class="products-table">
+      <thead><tr>
+        <th>Producto</th><th>Categoría</th><th>Precio</th>
+        <th>Por unidad</th><th>Variación</th><th></th>
+      </tr></thead>
+      <tbody>${rows.join("")}</tbody>
+    </table>`;
+}
+
+// ── SELECTOR & CHART ──────────────────────────────────
+function populateSelector() {
+  const sel = document.getElementById("productSelect");
+  const nombres = [...new Set(state.productosActuales.map(p => p.nombre))].sort();
+  sel.innerHTML = '<option value="">— Elige un producto —</option>' +
+    nombres.map(n => `<option value="${escH(n)}">${escH(n)}</option>`).join("");
+  sel.addEventListener("change", () => renderChart(sel.value));
+}
+
+function selectProduct(nombre) {
+  const sel = document.getElementById("productSelect");
+  sel.value = nombre;
+  renderChart(nombre);
+  document.querySelector(".chart-card").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function renderChart(nombre) {
+  document.getElementById("chartProductName").textContent = nombre || "—";
+  const canvas = document.getElementById("priceChart");
+  if (!nombre) {
+    if (state.chart) { state.chart.destroy(); state.chart = null; }
+    return;
+  }
+
+  const fechas  = state.historico.fechas;
+  const labels  = fechas.map(fmt);
+  const valores = fechas.map(f => {
+    const d = state.historico.datos[f] || [];
+    const p = d.find(x => nf(x.nombre) === nf(nombre));
+    return p ? p.precio : null;
+  });
+
+  const validos  = valores.filter(v => v !== null);
+  const minV     = Math.min(...validos);
+  const maxV     = Math.max(...validos);
+  const pad      = (maxV - minV) * 0.15 || 0.1;
+
+  if (state.chart) state.chart.destroy();
+
+  state.chart = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: nombre,
+        data: valores,
+        borderColor: "#111111",
+        backgroundColor: "rgba(17,17,17,.04)",
+        borderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: "#111111",
+        fill: true,
+        tension: 0.25,
+        spanGaps: true,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: ctx => ` ${ctx.raw?.toFixed(2) ?? "—"} €` },
+          backgroundColor: "#111",
+          titleColor: "#999",
+          bodyColor: "#fff",
+          padding: 10,
+          cornerRadius: 4,
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: "Inter", size: 10 }, color: "#888" },
+        },
+        y: {
+          min: Math.max(0, minV - pad),
+          max: maxV + pad,
+          ticks: {
+            font: { family: "Inter", size: 10 },
+            color: "#888",
+            callback: v => `${v.toFixed(2)} €`,
+          },
+          grid: { color: "#f0f0ee" },
+        },
+      },
+    },
+  });
+}
+
+// ── SEARCH ────────────────────────────────────────────
+document.getElementById("searchInput").addEventListener("input", e => {
+  const q = nf(e.target.value.trim());
+  const filtrados = q
+    ? state.productosActuales.filter(p =>
+        nf(p.nombre).includes(q) || nf(p.categoria || "").includes(q))
+    : state.productosActuales;
+  renderTable(filtrados);
+});
+
+// ── ERROR STATE ───────────────────────────────────────
+function renderError() {
+  document.getElementById("lastUpdateBadge").textContent = "Sin datos";
+  document.getElementById("basketGrid").innerHTML = `<div class="state-box" style="background:#fff;grid-column:1/-1">
+    <div class="state-title">Sin datos disponibles</div>
+    <div class="state-desc">Ejecuta el scraper para generar <code>data/historico_completo.json</code>.</div></div>`;
+  document.getElementById("tableContainer").innerHTML = `<div class="state-box">
+    <div class="state-title">Sin datos</div></div>`;
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function nf(s) {
+  return (s || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function escH(s) {
+  return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function fmt(d) {
+  if (!d) return "—";
+  const [y, m, day] = d.split("-");
+  return `${day}/${m}/${y}`;
+}
+function diffBadge(diff) {
+  if (Math.abs(diff) < 0.001)
+    return `<span class="diff-badge flat">= sin cambio</span>`;
+  if (diff > 0)
+    return `<span class="diff-badge up">▲ +${diff.toFixed(2)} €</span>`;
+  return `<span class="diff-badge down">▼ ${Math.abs(diff).toFixed(2)} €</span>`;
+}
+
+// ── INIT ──────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
