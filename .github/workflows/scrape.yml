@@ -1,0 +1,45 @@
+name: Scrape Mercadona Prices
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # Diariamente a las 08:00 UTC
+  workflow_dispatch:        # Permite ejecución manual desde el panel de GitHub
+
+permissions:
+  contents: write           # Necesario para git push
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout del repositorio
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🐍 Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: 🕷️ Ejecutar scraper
+        run: python scraper.py
+
+      - name: 💾 Commit y push de los datos generados
+        run: |
+          git config --global user.name "InflacionMerida Bot"
+          git config --global user.email "bot@inflacionmerida.github.io"
+          git add data/
+          # Solo hace commit si hay cambios reales
+          if git diff --staged --quiet; then
+            echo "Sin cambios nuevos que guardar."
+          else
+            DATE=$(date +%Y-%m-%d)
+            git commit -m "📊 Precios actualizados: $DATE"
+            git push
+          fi
