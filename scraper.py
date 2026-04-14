@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-InflacionMerida - Scraper de cesta basica via API REST de Mercadona.
-Estrategia: navegar el arbol de categorias raiz y filtrar productos por
-palabras clave. Guarda:
-  - data/prices_YYYY-MM-DD.json  (snapshot diario)
-  - data/historico_completo.json (historico acumulado, leido por el frontend)
+InflacionMerida - Scraper Extendido (Mérida XYZ Extra)
+Estrategia: navegación de API Mercadona con más de 100 productos categorizados.
+Grupos de Índice: Alimentación, Bebidas, Mascotas, Hogar, Higiene.
 """
 
 import sys
@@ -17,97 +15,145 @@ import time
 from datetime import datetime
 from unicodedata import normalize
 
-# Fuerza UTF-8 en consola Windows para evitar UnicodeEncodeError
+# Fuerza UTF-8
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
-# ──────────────────────────────────────────────────────────────────────────────
-# CONFIGURACION
-# ──────────────────────────────────────────────────────────────────────────────
-
 API_BASE = "https://tienda.mercadona.es/api"
-# Warehouse: vlc1=Valencia/peninsula. Mercadona usa el mismo catalogo para toda
-# la peninsula, por lo que los precios son equivalentes a los de Merida.
 WAREHOUSE = "vlc1"
 LANG      = "es"
 
 HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/123.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "es-ES,es;q=0.9",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     "Origin": "https://tienda.mercadona.es",
-    "Referer": "https://tienda.mercadona.es/",
 }
 
-# Palabras clave normalizadas (sin tildes, minusculas) que identifican
-# los productos de la cesta basica. Cuanto mas especifica sea la keyword,
-# menos falsos positivos.
-# Cada entrada: keyword (sin tildes, minusculas) -> categoria display
-# IMPORTANTE: keywords largas primero para evitar falsos positivos en subcadenas
-KEYWORDS = {
-    # --- Lacteos ---
-    "leche entera hacendado":        "Lacteos",
-    "leche semidesnatada hacendado": "Lacteos",
-    "leche desnatada hacendado":     "Lacteos",
-    "yogur natural hacendado":       "Lacteos",
-    "mantequilla hacendado":         "Lacteos",
-    "queso tierno":                  "Lacteos",
-    # --- Huevos ---
-    "huevos camperos":               "Huevos",
-    "huevos de gallinas camperas":   "Huevos",
-    "huevos frescos":                "Huevos",
-    # --- Carne ---
-    "filetes pechuga de pollo":      "Carne y aves",
-    "contramuslos de pollo":         "Carne y aves",
-    "carne picada mixta":            "Carne y aves",
-    "filetes lomo de cerdo":         "Carne y aves",
-    # --- Pescado ---
-    "filetes de merluza":            "Pescado",
-    "merluza":                       "Pescado",
-    "atun en aceite de girasol hacendado": "Pescado",
-    "sardinas en aceite de oliva hacendado": "Pescado",
-    "mejillones en escabeche hacendado": "Pescado",
-    # --- Frutas ---
-    "manzana royal gala":            "Frutas",
-    "manzana golden":                "Frutas",
-    "pera conferencia":              "Frutas",
-    "mandarina clementina":          "Frutas",
-    "mandarina": "Frutas",
-    # --- Verduras ---
-    "tomate rama": "Verduras",
-    "tomates rama": "Verduras",
-    "patatas hacendado":             "Verduras",
-    "cebolla": "Verduras",
-    "zanahoria": "Verduras",
-    "lechuga iceberg": "Verduras",
-    "judias verdes redondas hacendado": "Verduras",
-    "pimiento rojo": "Verduras",
-    # --- Pan ---
-    "pan de molde blanco":           "Pan",
-    "pan integral trigo":            "Pan",
-    # --- Aceites ---
-    "aceite de oliva virgen extra hacendado": "Aceites",
-    "aceite de girasol refinado":    "Aceites",
-    # --- Cereales y legumbres ---
-    "arroz redondo hacendado":       "Cereales",
-    "espaguetis hacendado":          "Cereales",
-    "lentejas hacendado":            "Cereales",
-    "garbanzos cocidos hacendado":   "Cereales",
-    "alubias cocidas hacendado":     "Cereales",
-    # --- Conservas ---
-    "tomate frito hacendado":        "Conservas",
-    "tomate triturado hacendado":    "Conservas",
-    # --- Basicos ---
-    "azucar blanquilla hacendado":   "Basicos",
-    "sal fina hacendado":            "Basicos",
-    "harina de trigo hacendado":     "Basicos",
-    # --- Agua ---
-    "agua mineral grande bronchales": "Agua",
-    "agua mineral hacendado":        "Agua",
+# ──────────────────────────────────────────────────────────────────────────────
+# CONFIGURACION DE PRODUCTOS (100+ KEYWORDS)
+# cada entrada: keyword -> (Categoría Display, Grupo Indice)
+# ──────────────────────────────────────────────────────────────────────────────
+
+PRODUCT_MAP = {
+    # --- ALIMENTACION (Básicos) ---
+    "leche entera hacendado":        ("Lácteos", "ALIMENTACION"),
+    "leche semidesnatada hacendado": ("Lácteos", "ALIMENTACION"),
+    "leche desnatada hacendado":     ("Lácteos", "ALIMENTACION"),
+    "yogur natural hacendado":       ("Lácteos", "ALIMENTACION"),
+    "mantequilla hacendado":         ("Lácteos", "ALIMENTACION"),
+    "queso tierno":                  ("Lácteos", "ALIMENTACION"),
+    "queso rallado mozzarella":      ("Lácteos", "ALIMENTACION"),
+    "queso lonchas":                 ("Lácteos", "ALIMENTACION"),
+    "huevos camperos":               ("Huevos", "ALIMENTACION"),
+    "huevos frescos l":              ("Huevos", "ALIMENTACION"),
+    # Carnes
+    "filetes pechuga de pollo":      ("Carnicería", "ALIMENTACION"),
+    "contramuslos de pollo":         ("Carnicería", "ALIMENTACION"),
+    "pechuga de pavo":               ("Carnicería", "ALIMENTACION"),
+    "carne picada vacuno":           ("Carnicería", "ALIMENTACION"),
+    "filetes ternera":               ("Carnicería", "ALIMENTACION"),
+    "lomo de cerdo":                 ("Carnicería", "ALIMENTACION"),
+    "chorizo":                       ("Carnicería", "ALIMENTACION"),
+    "jamon cocido extra":            ("Carnicería", "ALIMENTACION"),
+    "jamon serrano":                 ("Carnicería", "ALIMENTACION"),
+    # Pescados
+    "filetes de merluza":            ("Pescado", "ALIMENTACION"),
+    "merluza":                       ("Pescado", "ALIMENTACION"),
+    "salmon":                        ("Pescado", "ALIMENTACION"),
+    "atun en aceite de girasol":     ("Conservas", "ALIMENTACION"),
+    "sardinas en aceite":            ("Conservas", "ALIMENTACION"),
+    "mejillones en escabeche":       ("Conservas", "ALIMENTACION"),
+    # Frutas y Verduras
+    "manzana royal gala":            ("Fruta", "ALIMENTACION"),
+    "manzana golden":                ("Fruta", "ALIMENTACION"),
+    "pera conferencia":              ("Fruta", "ALIMENTACION"),
+    "mandarina":                     ("Fruta", "ALIMENTACION"),
+    "platano":                       ("Fruta", "ALIMENTACION"),
+    "limon":                         ("Fruta", "ALIMENTACION"),
+    "kiwi":                          ("Fruta", "ALIMENTACION"),
+    "aguacate":                      ("Fruta", "ALIMENTACION"),
+    "tomates rama":                  ("Verdura", "ALIMENTACION"),
+    "patatas":                       ("Verdura", "ALIMENTACION"),
+    "cebolla":                       ("Verdura", "ALIMENTACION"),
+    "zanahoria":                     ("Verdura", "ALIMENTACION"),
+    "lechuga iceberg":               ("Verdura", "ALIMENTACION"),
+    "calabacin":                     ("Verdura", "ALIMENTACION"),
+    "berenjena":                     ("Verdura", "ALIMENTACION"),
+    "brocoli":                       ("Verdura", "ALIMENTACION"),
+    "pimiento rojo":                 ("Verdura", "ALIMENTACION"),
+    "pepino":                        ("Verdura", "ALIMENTACION"),
+    "ajos":                          ("Verdura", "ALIMENTACION"),
+    # Desayuno / Despensa
+    "pan de molde blanco":           ("Panadería", "ALIMENTACION"),
+    "pan integral":                  ("Panadería", "ALIMENTACION"),
+    "barra de pan":                  ("Panadería", "ALIMENTACION"),
+    "aceite oliva virgen extra":     ("Aceites", "ALIMENTACION"),
+    "aceite girasol":                ("Aceites", "ALIMENTACION"),
+    "arroz redondo":                 ("Cereales", "ALIMENTACION"),
+    "espaguetis":                    ("Cereales", "ALIMENTACION"),
+    "macarrones":                    ("Cereales", "ALIMENTACION"),
+    "lentejas":                      ("Legumbres", "ALIMENTACION"),
+    "garbanzos":                     ("Legumbres", "ALIMENTACION"),
+    "alubias":                       ("Legumbres", "ALIMENTACION"),
+    "azucar blanquilla":             ("Básicos", "ALIMENTACION"),
+    "sal fina":                      ("Básicos", "ALIMENTACION"),
+    "harina de trigo":               ("Básicos", "ALIMENTACION"),
+    "cafe molido":                   ("Despensa", "ALIMENTACION"),
+    "cacao soluble":                 ("Despensa", "ALIMENTACION"),
+    "galletas maria":                ("Despensa", "ALIMENTACION"),
+    "chocolate 70%":                 ("Despensa", "ALIMENTACION"),
+    "mermelada":                     ("Despensa", "ALIMENTACION"),
+    "miel":                          ("Despensa", "ALIMENTACION"),
+    "cereales corn flakes":          ("Despensa", "ALIMENTACION"),
+    "nueces peladas":                ("Despensa", "ALIMENTACION"),
+    "tomate frito":                  ("Conservas", "ALIMENTACION"),
+    "tomate triturado":              ("Conservas", "ALIMENTACION"),
+    "caldo de pollo":                ("Conservas", "ALIMENTACION"),
+    # Congelados
+    "pizza margarita":               ("Congelados", "ALIMENTACION"),
+    "varitas de pescado":            ("Congelados", "ALIMENTACION"),
+    "guisantes congelados":          ("Congelados", "ALIMENTACION"),
+
+    # --- BEBIDAS / ALCOHOL ---
+    "cerveza steinburg clasica":     ("Cerveza", "BEBIDAS"),
+    "cerveza cruzcampo":             ("Cerveza", "BEBIDAS"),
+    "vino tinto rioja":              ("Vino", "BEBIDAS"),
+    "vino tinto ribera":             ("Vino", "BEBIDAS"),
+    "vino blanco rueda":             ("Vino", "BEBIDAS"),
+    "refresco cola":                 ("Refrescos", "BEBIDAS"),
+    "refresco naranja":              ("Refrescos", "BEBIDAS"),
+    "refresco limon":                ("Refrescos", "BEBIDAS"),
+    "agua mineral grande":           ("Agua", "BEBIDAS"),
+    "zumo naranja exprimido":        ("Zumos", "BEBIDAS"),
+
+    # --- MASCOTAS ---
+    "comida perro adulto compy":     ("Perro", "MASCOTAS"),
+    "pienso perro":                  ("Perro", "MASCOTAS"),
+    "comida gato adulto compy":      ("Gato", "MASCOTAS"),
+    "pienso gato":                   ("Gato", "MASCOTAS"),
+    "arena para gatos":              ("Gato", "MASCOTAS"),
+    "alimento humedo perro":         ("Mascotas", "MASCOTAS"),
+    "alimento humedo gato":          ("Mascotas", "MASCOTAS"),
+
+    # --- HOGAR / LIMPIEZA ---
+    "detergente ropa liquido":       ("Limpieza", "HOGAR"),
+    "suavizante ropa":               ("Limpieza", "HOGAR"),
+    "lavavajillas mano":             ("Limpieza", "HOGAR"),
+    "pastillas lavavajillas":        ("Limpieza", "HOGAR"),
+    "limpiador multiusos":           ("Limpieza", "HOGAR"),
+    "lejia":                         ("Limpieza", "HOGAR"),
+    "limpiasuelos":                  ("Limpieza", "HOGAR"),
+    "papel higienico":               ("Papel", "HOGAR"),
+    "papel de cocina":               ("Papel", "HOGAR"),
+    "bolsas de basura":              ("Hogar", "HOGAR"),
+
+    # --- HIGIENE ---
+    "champu":                        ("Cuidado", "HIGIENE"),
+    "gel de baño":                   ("Cuidado", "HIGIENE"),
+    "pasta de dientes":              ("Cuidado", "HIGIENE"),
+    "desodorante":                   ("Cuidado", "HIGIENE"),
+    "jabon de manos":                ("Cuidado", "HIGIENE"),
+    "compresas":                     ("Cuidado", "HIGIENE"),
+    "tampones":                      ("Cuidado", "HIGIENE"),
 }
 
 DATA_DIR       = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -118,9 +164,7 @@ HISTORICO_PATH = os.path.join(DATA_DIR, "historico_completo.json")
 # ──────────────────────────────────────────────────────────────────────────────
 
 def nfkd(s: str) -> str:
-    """Normaliza a ASCII-safe minusculas (sin tildes ni caracteres especiales)."""
     return normalize("NFKD", s.lower()).encode("ascii", "ignore").decode("ascii")
-
 
 def get_json(url: str, params: dict = None) -> dict | None:
     try:
@@ -131,7 +175,6 @@ def get_json(url: str, params: dict = None) -> dict | None:
         print(f"    [!] HTTP error {url}: {e}")
         return None
 
-
 def extraer_precio(product: dict) -> float | None:
     try:
         pi = product.get("price_instructions", {})
@@ -140,168 +183,108 @@ def extraer_precio(product: dict) -> float | None:
     except (TypeError, ValueError):
         return None
 
-
-def keyword_match(nombre_norm: str) -> tuple[str, str] | None:
-    """Devuelve (keyword, categoria) si el nombre encaja con alguna keyword."""
-    for kw, cat in KEYWORDS.items():
+def match_product(nombre_norm: str) -> tuple[str, str, str] | None:
+    """Devuelve (keyword, categoria_desc, grupo_indice) si encaja."""
+    for kw, (cat, grupo) in PRODUCT_MAP.items():
         if kw in nombre_norm:
-            return kw, cat
+            return kw, cat, grupo
     return None
 
-
 # ──────────────────────────────────────────────────────────────────────────────
-# LOGICA SCRAPER
+# MAIN SCRAPER
 # ──────────────────────────────────────────────────────────────────────────────
 
-def obtener_arbol_categorias() -> list[dict]:
-    """Descarga el arbol raiz de categorias de Mercadona."""
-    data = get_json(f"{API_BASE}/categories/", {"lang": LANG, "wh": WAREHOUSE})
-    if not data:
-        return []
-    # La API devuelve { results: [ { id, name, categories: [...] } ] }
-    return data.get("results", [])
-
-
-def obtener_productos_subcategoria(subcat_id: str) -> list[dict]:
-    """Devuelve todos los productos de una subcategoria concreta."""
-    data = get_json(f"{API_BASE}/categories/{subcat_id}/", {"lang": LANG, "wh": WAREHOUSE})
-    if not data:
-        return []
-    productos = []
-    # La subcategoria puede tener directamente 'products' o sub-subcategorias
-    for cat in data.get("categories", [data]):
-        productos.extend(cat.get("products", []))
-    return productos
-
-
-def scrape_precios() -> list[dict]:
-    """
-    Recorre todas las categorias raiz → subcategorias → productos y
-    filtra los que coinciden con las keywords de la cesta basica.
-    """
-    print("  >> Descargando arbol de categorias...")
-    raices = obtener_arbol_categorias()
-    if not raices:
-        print("  [!] No se pudo obtener el arbol. Abortando.")
+def scrape_full() -> list[dict]:
+    print("  >> Descargando árbol de categorías de Mercadona...")
+    raices = get_json(f"{API_BASE}/categories/", {"lang": LANG, "wh": WAREHOUSE})
+    if not raices or "results" not in raices:
         return []
 
-    print(f"  >> {len(raices)} categorias raiz encontradas.")
+    results = raices.get("results", [])
+    encontrados: dict[str, dict] = {}  # key = keyword
 
-    encontrados: dict[str, dict] = {}  # key = keyword, val = producto (1 por keyword)
-
-    for raiz in raices:
-        raiz_nombre = raiz.get("name", "?")
-        subcategorias = raiz.get("categories", [])
-
-        for subcat in subcategorias:
-            subcat_id   = str(subcat.get("id", ""))
-            subcat_name = subcat.get("name", "?")
-
-            productos_raw = obtener_productos_subcategoria(subcat_id)
-            time.sleep(0.5)  # Rate limiting
-
-            for prod in productos_raw:
-                nombre     = prod.get("display_name", "")
-                nombre_n   = nfkd(nombre)
-                match      = keyword_match(nombre_n)
-                if not match:
-                    continue
-
-                kw, cat_display = match
-                precio = extraer_precio(prod)
-                if precio is None:
-                    continue
-
-                # Solo guardamos el primer producto que encaje con cada keyword
-                if kw not in encontrados:
-                    pi = prod.get("price_instructions", {})
-                    encontrados[kw] = {
-                        "id":               str(prod.get("id", "")),
-                        "nombre":           nombre,
-                        "precio":           precio,
-                        "precio_por_unidad": pi.get("reference_price"),
-                        "unidad_medida":    pi.get("reference_format"),
-                        "categoria":        cat_display,
-                        "categoria_api":    f"{raiz_nombre} > {subcat_name}",
-                        "thumbnail":        prod.get("thumbnail"),
-                        "keyword":          kw,
-                    }
-                    print(f"    [OK] {nombre[:45]:45s} = {precio:.2f} EUR  [{cat_display}]")
-
-            # Si ya tenemos todos los productos, no hace falta seguir
-            if len(encontrados) >= len(KEYWORDS):
-                break
-
-        if len(encontrados) >= len(KEYWORDS):
+    for raiz in results:
+        raiz_name = raiz.get("name", "?")
+        print(f"  -- Procesando raiz: {raiz_name}")
+        
+        for subcat in raiz.get("categories", []):
+            subcat_id = str(subcat.get("id", ""))
+            
+            # Rate limit preventivo
+            time.sleep(0.4)
+            data = get_json(f"{API_BASE}/categories/{subcat_id}/", {"lang": LANG, "wh": WAREHOUSE})
+            if not data: continue
+            
+            # Recopilar todos los productos de esta subcat (y sus hijos)
+            productos_sub = []
+            for c in data.get("categories", [data]):
+                productos_sub.extend(c.get("products", []))
+            
+            for prod in productos_sub:
+                nombre   = prod.get("display_name", "")
+                nombre_n = nfkd(nombre)
+                match    = match_product(nombre_n)
+                
+                if match:
+                    kw, display_cat, grupo = match
+                    precio = extraer_precio(prod)
+                    if precio is None: continue
+                    
+                    # Guardamos el primero que encontremos para esa keyword
+                    if kw not in encontrados:
+                        pi = prod.get("price_instructions", {})
+                        encontrados[kw] = {
+                            "id":               str(prod.get("id", "")),
+                            "nombre":           nombre,
+                            "precio":           precio,
+                            "precio_por_unidad": pi.get("reference_price"),
+                            "unidad_medida":    pi.get("reference_format"),
+                            "categoria":        display_cat,
+                            "grupo":            grupo,
+                            "thumbnail":        prod.get("thumbnail"),
+                            "keyword":          kw,
+                        }
+                        print(f"    [OK] {nombre[:40]:40s} = {precio:5.2f}€ [{grupo}]")
+        
+        # Si ya hemos encontrado todo, paramos (ahorramos peticiones)
+        if len(encontrados) >= len(PRODUCT_MAP):
             break
 
-    resultado = list(encontrados.values())
-    resultado.sort(key=lambda x: x["categoria"])
-    print(f"\n  >> {len(resultado)}/{len(KEYWORDS)} productos de la cesta encontrados.")
-    return resultado
+    final = list(encontrados.values())
+    print(f"\n  >> Fin del scrape. Encontrados {len(final)}/{len(PRODUCT_MAP)} productos.")
+    return final
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-# GUARDADO DE DATOS
-# ──────────────────────────────────────────────────────────────────────────────
-
-def guardar_diario(productos: list[dict], fecha: str) -> str:
+def save_data(productos: list[dict], fecha: str):
     os.makedirs(DATA_DIR, exist_ok=True)
-    ruta = os.path.join(DATA_DIR, f"prices_{fecha}.json")
-    with open(ruta, "w", encoding="utf-8") as f:
-        json.dump({
-            "fecha": fecha,
-            "total_productos": len(productos),
-            "productos": productos,
-        }, f, ensure_ascii=False, indent=2)
-    print(f"  >> JSON diario guardado: prices_{fecha}.json")
-    return ruta
-
-
-def actualizar_historico(productos: list[dict], fecha: str):
-    """Agrega (o actualiza) la entrada de fecha en historico_completo.json."""
-    os.makedirs(DATA_DIR, exist_ok=True)
+    
+    # Snapshot diario
+    with open(os.path.join(DATA_DIR, f"prices_{fecha}.json"), "w", encoding="utf-8") as f:
+        json.dump({"fecha": fecha, "productos": productos}, f, ensure_ascii=False, indent=2)
+    
+    # Historico completo
     if os.path.exists(HISTORICO_PATH):
         with open(HISTORICO_PATH, "r", encoding="utf-8") as f:
-            historico = json.load(f)
+            hist = json.load(f)
     else:
-        historico = {"fechas": [], "datos": {}}
-
-    historico["datos"][fecha] = productos
-    if fecha not in historico["fechas"]:
-        historico["fechas"].append(fecha)
-        historico["fechas"].sort()
-
+        hist = {"fechas": [], "datos": {}}
+    
+    hist["datos"][fecha] = productos
+    if fecha not in hist["fechas"]:
+        hist["fechas"].append(fecha)
+        hist["fechas"].sort()
+    
     with open(HISTORICO_PATH, "w", encoding="utf-8") as f:
-        json.dump(historico, f, ensure_ascii=False, indent=2)
-    print(f"  >> Historico: {len(historico['fechas'])} fechas registradas.")
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MAIN
-# ──────────────────────────────────────────────────────────────────────────────
+        json.dump(hist, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     hoy = datetime.now().strftime("%Y-%m-%d")
-    borde = "=" * 58
-
-    print(f"\n{borde}")
-    print(f"  InflacionMerida - Scraper  [{hoy}]")
-    print(f"{borde}\n")
-
-    print("[1/3] Extrayendo precios vía API Mercadona...")
-    productos = scrape_precios()
-
-    if not productos:
-        print("\n[!] No se obtuvieron productos. Abortando.")
+    print(f"\nINFLACION MERIDA - SCRAPER COMPLETO [{hoy}]")
+    print("=" * 60)
+    
+    productos = scrape_full()
+    if productos:
+        save_data(productos, hoy)
+        print(f"\nÉXITO: {len(productos)} productos indexados.")
+    else:
+        print("\nERROR: No se pudieron obtener datos.")
         sys.exit(1)
-
-    print("\n[2/3] Guardando JSON diario...")
-    guardar_diario(productos, hoy)
-
-    print("\n[3/3] Actualizando historico completo...")
-    actualizar_historico(productos, hoy)
-
-    print(f"\n{borde}")
-    print(f"  OK - {len(productos)} productos guardados correctamente.")
-    print(f"{borde}\n")
