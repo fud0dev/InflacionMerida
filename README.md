@@ -2,7 +2,7 @@
 
 > Seguimiento automático de precios de la cesta básica en Mérida usando datos reales de Mercadona. Actualización diaria mediante GitHub Actions y visualización en GitHub Pages.
 
-🔗 **Demo en vivo:** `https://TU-USUARIO.github.io/InflacionMerida/`
+🔗 **Demo en vivo:** `https://fud0dev.github.io/InflacionMerida/`
 
 ---
 
@@ -149,4 +149,4 @@ Este proyecto es **independiente** y no está afiliado a Mercadona S.A. Los dato
 
 ---
 
-*Creado como parte del proyecto [Mérida Digital Hub](https://github.com/TU-USUARIO)*
+*Creado como parte del proyecto [MeridaXYZ](https://meridaxyz.wordpress.com/)*
