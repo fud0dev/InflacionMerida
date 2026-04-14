@@ -1,5 +1,6 @@
 {
   "fechas": [
+    "2026-04-14",
     "2026-04-15"
   ],
   "datos": {
@@ -432,6 +433,393 @@
         "categoria_api": "Fruta y verdura > Lechuga y ensalada preparada",
         "thumbnail": "https://prod-mercadona.imgix.net/images/320cf3cbed15d3543322144333ce1a98.jpg?fit=crop&h=300&w=300",
         "keyword": "lechuga"
+      }
+    ],
+    "2026-04-14": [
+      {
+        "id": "4717",
+        "nombre": "Aceite de oliva virgen extra Hacendado",
+        "precio": 14.55,
+        "precio_por_unidad": "4.850",
+        "unidad_medida": "L",
+        "categoria": "Aceites",
+        "categoria_api": "Aceite, especias y salsas > Aceite, vinagre y sal",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/cd149804838dc230dad3c2a314cf2286.jpg?fit=crop&h=300&w=300",
+        "keyword": "aceite de oliva virgen extra hacendado"
+      },
+      {
+        "id": "4041",
+        "nombre": "Aceite de girasol refinado 0,2º Hacendado",
+        "precio": 8.3,
+        "precio_por_unidad": "1.660",
+        "unidad_medida": "L",
+        "categoria": "Aceites",
+        "categoria_api": "Aceite, especias y salsas > Aceite, vinagre y sal",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/e6398afba1d032d2e1c0489fd727d2f6.jpg?fit=crop&h=300&w=300",
+        "keyword": "aceite de girasol refinado"
+      },
+      {
+        "id": "28035",
+        "nombre": "Agua mineral grande Bronchales",
+        "precio": 1.3,
+        "precio_por_unidad": "0.217",
+        "unidad_medida": "L",
+        "categoria": "Agua",
+        "categoria_api": "Agua y refrescos > Agua",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/66cc0d02f8e7c1ae6820ce725f05e80d.jpg?fit=crop&h=300&w=300",
+        "keyword": "agua mineral grande bronchales"
+      },
+      {
+        "id": "19731",
+        "nombre": "Sal fina Hacendado",
+        "precio": 0.4,
+        "precio_por_unidad": "0.400",
+        "unidad_medida": "kg",
+        "categoria": "Basicos",
+        "categoria_api": "Aceite, especias y salsas > Aceite, vinagre y sal",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/5097b3d7450edab7c2d9586299f5f3b9.jpg?fit=crop&h=300&w=300",
+        "keyword": "sal fina hacendado"
+      },
+      {
+        "id": "29100",
+        "nombre": "Harina de trigo Hacendado",
+        "precio": 0.72,
+        "precio_por_unidad": "0.720",
+        "unidad_medida": "kg",
+        "categoria": "Basicos",
+        "categoria_api": "Panadería y pastelería > Harina y preparado repostería",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/7b45ccb598af14286ed6a98dd181833b.jpg?fit=crop&h=300&w=300",
+        "keyword": "harina de trigo hacendado"
+      },
+      {
+        "id": "3400",
+        "nombre": "Filetes pechuga de pollo corte fino",
+        "precio": 4.84,
+        "precio_por_unidad": "8.200",
+        "unidad_medida": "kg",
+        "categoria": "Carne y aves",
+        "categoria_api": "Carne > Aves y pollo",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/c89d28c5929f14861da52e2508912e3d.jpg?fit=crop&h=300&w=300",
+        "keyword": "filetes pechuga de pollo"
+      },
+      {
+        "id": "2789",
+        "nombre": "Contramuslos de pollo deshuesados y sin piel",
+        "precio": 3.58,
+        "precio_por_unidad": "6.500",
+        "unidad_medida": "kg",
+        "categoria": "Carne y aves",
+        "categoria_api": "Carne > Aves y pollo",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/6f014202bb9ed41e5125106c87ef1c74.jpg?fit=crop&h=300&w=300",
+        "keyword": "contramuslos de pollo"
+      },
+      {
+        "id": "2714",
+        "nombre": "Filetes lomo de cerdo",
+        "precio": 3.52,
+        "precio_por_unidad": "6.900",
+        "unidad_medida": "kg",
+        "categoria": "Carne y aves",
+        "categoria_api": "Carne > Cerdo",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/ad3b003f7703142ad9e425eebb3990b0.jpg?fit=crop&h=300&w=300",
+        "keyword": "filetes lomo de cerdo"
+      },
+      {
+        "id": "5044",
+        "nombre": "Arroz redondo Hacendado",
+        "precio": 1.3,
+        "precio_por_unidad": "1.300",
+        "unidad_medida": "kg",
+        "categoria": "Cereales",
+        "categoria_api": "Arroz, legumbres y pasta > Arroz",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/0daf43fb5761b823ce83c985930c97c9.jpg?fit=crop&h=300&w=300",
+        "keyword": "arroz redondo hacendado"
+      },
+      {
+        "id": "11628",
+        "nombre": "Crema de lentejas Hacendado",
+        "precio": 1.7,
+        "precio_por_unidad": "4.858",
+        "unidad_medida": "kg",
+        "categoria": "Cereales",
+        "categoria_api": "Conservas, caldos y cremas > Gazpacho y cremas",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/c75cd6195526f2bfecb9f1783f39297a.jpg?fit=crop&h=300&w=300",
+        "keyword": "lentejas hacendado"
+      },
+      {
+        "id": "17132",
+        "nombre": "Tomate frito Hacendado",
+        "precio": 1.35,
+        "precio_por_unidad": "1.125",
+        "unidad_medida": "kg",
+        "categoria": "Conservas",
+        "categoria_api": "Aceite, especias y salsas > Otras salsas",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/e589c8259daf4b9335098fb9ade7ee09.jpg?fit=crop&h=300&w=300",
+        "keyword": "tomate frito hacendado"
+      },
+      {
+        "id": "16043",
+        "nombre": "Tomate triturado Hacendado",
+        "precio": 1.05,
+        "precio_por_unidad": "1.313",
+        "unidad_medida": "kg",
+        "categoria": "Conservas",
+        "categoria_api": "Conservas, caldos y cremas > Tomate",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/117a2a2230b103f17b50e07a73a8fc38.jpg?fit=crop&h=300&w=300",
+        "keyword": "tomate triturado hacendado"
+      },
+      {
+        "id": "22186",
+        "nombre": "Papilla plátano, mandarina y pera Hacendado +4 meses",
+        "precio": 2.85,
+        "precio_por_unidad": "5.481",
+        "unidad_medida": "kg",
+        "categoria": "Frutas",
+        "categoria_api": "Bebé > Alimentación infantil",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/3ca8f8d33d4c3549e9c9cd6ac901febe.jpg?fit=crop&h=300&w=300",
+        "keyword": "mandarina"
+      },
+      {
+        "id": "3028",
+        "nombre": "Manzana Golden",
+        "precio": 0.46,
+        "precio_por_unidad": "2.200",
+        "unidad_medida": "kg",
+        "categoria": "Frutas",
+        "categoria_api": "Fruta y verdura > Fruta",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/12cc1ef38a5b781f364ca22e46a25ad7.jpg?fit=crop&h=300&w=300",
+        "keyword": "manzana golden"
+      },
+      {
+        "id": "3119",
+        "nombre": "Pera Conferencia",
+        "precio": 0.49,
+        "precio_por_unidad": "2.450",
+        "unidad_medida": "kg",
+        "categoria": "Frutas",
+        "categoria_api": "Fruta y verdura > Fruta",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/debea7dc78060cb9cab5c608e7f9eb27.jpg?fit=crop&h=300&w=300",
+        "keyword": "pera conferencia"
+      },
+      {
+        "id": "15768",
+        "nombre": "Huevos de gallinas camperas",
+        "precio": 3.5,
+        "precio_por_unidad": "3.500",
+        "unidad_medida": "dc",
+        "categoria": "Huevos",
+        "categoria_api": "Huevos, leche y mantequilla > Huevos",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/50933500ef69e4c4cc91733c48e4e909.jpg?fit=crop&h=300&w=300",
+        "keyword": "huevos de gallinas camperas"
+      },
+      {
+        "id": "34212",
+        "nombre": "Palomitas de maíz sabor mantequilla Hacendado para microondas",
+        "precio": 1.2,
+        "precio_por_unidad": "4.445",
+        "unidad_medida": "kg",
+        "categoria": "Lacteos",
+        "categoria_api": "Aperitivos > Frutos secos y fruta desecada",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/f8ea8d436cfb80f7e563563cbe8b9316.jpg?fit=crop&h=300&w=300",
+        "keyword": "mantequilla hacendado"
+      },
+      {
+        "id": "50916",
+        "nombre": "Queso tierno de vaca Hacendado cortado en cuñitas",
+        "precio": 2.62,
+        "precio_por_unidad": "8.200",
+        "unidad_medida": "kg",
+        "categoria": "Lacteos",
+        "categoria_api": "Charcutería y quesos > Queso curado, semicurado y tierno",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/186dfb670bf13288034301d6a83b155f.jpg?fit=crop&h=300&w=300",
+        "keyword": "queso tierno"
+      },
+      {
+        "id": "10381",
+        "nombre": "Leche semidesnatada Hacendado",
+        "precio": 5.04,
+        "precio_por_unidad": "0.840",
+        "unidad_medida": "L",
+        "categoria": "Lacteos",
+        "categoria_api": "Huevos, leche y mantequilla > Leche y bebidas vegetales",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/b9613b9354f8b0705f998b2201ffe443.jpg?fit=crop&h=300&w=300",
+        "keyword": "leche semidesnatada hacendado"
+      },
+      {
+        "id": "10383",
+        "nombre": "Leche desnatada Hacendado",
+        "precio": 4.92,
+        "precio_por_unidad": "0.820",
+        "unidad_medida": "L",
+        "categoria": "Lacteos",
+        "categoria_api": "Huevos, leche y mantequilla > Leche y bebidas vegetales",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/40b9fc5096d638d3e3fe2c5d4f8eb1d8.jpg?fit=crop&h=300&w=300",
+        "keyword": "leche desnatada hacendado"
+      },
+      {
+        "id": "10379",
+        "nombre": "Leche entera Hacendado",
+        "precio": 5.76,
+        "precio_por_unidad": "0.960",
+        "unidad_medida": "L",
+        "categoria": "Lacteos",
+        "categoria_api": "Huevos, leche y mantequilla > Leche y bebidas vegetales",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/4b1fd692f8032ec9e1ff419f27a856a4.jpg?fit=crop&h=300&w=300",
+        "keyword": "leche entera hacendado"
+      },
+      {
+        "id": "20210",
+        "nombre": "Yogur natural Hacendado 0% MG 0% azúcares añadidos",
+        "precio": 1.05,
+        "precio_por_unidad": "1.400",
+        "unidad_medida": "kg",
+        "categoria": "Lacteos",
+        "categoria_api": "Postres y yogures > Yogures desnatados",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/099ff343424be9697224fa076e7b2c87.jpg?fit=crop&h=300&w=300",
+        "keyword": "yogur natural hacendado"
+      },
+      {
+        "id": "12049.1",
+        "nombre": "Pan integral trigo 100%",
+        "precio": 1.5,
+        "precio_por_unidad": "4.286",
+        "unidad_medida": "kg",
+        "categoria": "Pan",
+        "categoria_api": "Panadería y pastelería > Pan de horno",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/af7f030f73aeb80be5996256f1b3f44f.jpg?fit=crop&h=300&w=300",
+        "keyword": "pan integral trigo"
+      },
+      {
+        "id": "82322",
+        "nombre": "Pan de molde blanco sin corteza Hacendado",
+        "precio": 1.1,
+        "precio_por_unidad": "2.445",
+        "unidad_medida": "kg",
+        "categoria": "Pan",
+        "categoria_api": "Panadería y pastelería > Pan de molde y otras especialidades",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/7931704a16106081eb2e0d81c340306c.jpg?fit=crop&h=300&w=300",
+        "keyword": "pan de molde blanco"
+      },
+      {
+        "id": "9280",
+        "nombre": "Papilla verduritas con merluza Hero Solo +6 meses",
+        "precio": 1.85,
+        "precio_por_unidad": "7.873",
+        "unidad_medida": "kg",
+        "categoria": "Pescado",
+        "categoria_api": "Bebé > Alimentación infantil",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/ff64697398b8e860ec176a9f98a74beb.jpg?fit=crop&h=300&w=300",
+        "keyword": "merluza"
+      },
+      {
+        "id": "62228",
+        "nombre": "Filetes de merluza del Cabo sin piel Hacendado ultracongelados",
+        "precio": 5.7,
+        "precio_por_unidad": "9.500",
+        "unidad_medida": "kg",
+        "categoria": "Pescado",
+        "categoria_api": "Congelados > Pescado",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/8169558ae5888d1de5b676bef2853d9d.jpg?fit=crop&h=300&w=300",
+        "keyword": "filetes de merluza"
+      },
+      {
+        "id": "18086",
+        "nombre": "Atún en aceite de girasol Hacendado",
+        "precio": 6.5,
+        "precio_por_unidad": "10.000",
+        "unidad_medida": "kg",
+        "categoria": "Pescado",
+        "categoria_api": "Conservas, caldos y cremas > Atún y otras conservas de pescado",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/2c06dcbb4643e6b4447d5d064c4eb6a5.jpg?fit=crop&h=300&w=300",
+        "keyword": "atun en aceite de girasol hacendado"
+      },
+      {
+        "id": "18225",
+        "nombre": "Sardinas en aceite de oliva Hacendado",
+        "precio": 2.2,
+        "precio_por_unidad": "13.096",
+        "unidad_medida": "kg",
+        "categoria": "Pescado",
+        "categoria_api": "Conservas, caldos y cremas > Atún y otras conservas de pescado",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/f0d751ea73bcb6ce3505fdc191fce5c8.jpg?fit=crop&h=300&w=300",
+        "keyword": "sardinas en aceite de oliva hacendado"
+      },
+      {
+        "id": "18619",
+        "nombre": "Mejillones en escabeche Hacendado pequeños",
+        "precio": 2.15,
+        "precio_por_unidad": "31.160",
+        "unidad_medida": "kg",
+        "categoria": "Pescado",
+        "categoria_api": "Conservas, caldos y cremas > Berberechos y mejillones",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/27b73289f0e656a60d6ac9f6bc01346d.jpg?fit=crop&h=300&w=300",
+        "keyword": "mejillones en escabeche hacendado"
+      },
+      {
+        "id": "34208",
+        "nombre": "Cebolla frita crujiente Hacendado",
+        "precio": 1.15,
+        "precio_por_unidad": "7.667",
+        "unidad_medida": "kg",
+        "categoria": "Verduras",
+        "categoria_api": "Aceite, especias y salsas > Especias",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/181ada199674ece135e225c9a06936c2.jpg?fit=crop&h=300&w=300",
+        "keyword": "cebolla"
+      },
+      {
+        "id": "9242",
+        "nombre": "Papilla zanahorias baby con ternera Hero Solo +6 meses",
+        "precio": 1.85,
+        "precio_por_unidad": "7.873",
+        "unidad_medida": "kg",
+        "categoria": "Verduras",
+        "categoria_api": "Bebé > Alimentación infantil",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/18e45fcbfe8b6177bcfd9e1c09ecc350.jpg?fit=crop&h=300&w=300",
+        "keyword": "zanahoria"
+      },
+      {
+        "id": "35221",
+        "nombre": "Pimiento rojo y verde Hacendado ultracongelado",
+        "precio": 1.2,
+        "precio_por_unidad": "2.667",
+        "unidad_medida": "kg",
+        "categoria": "Verduras",
+        "categoria_api": "Congelados > Verdura",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/edc3300ee19dd682083042d5b90d4ca1.jpg?fit=crop&h=300&w=300",
+        "keyword": "pimiento rojo"
+      },
+      {
+        "id": "16315",
+        "nombre": "Judías verdes redondas Hacendado",
+        "precio": 1.2,
+        "precio_por_unidad": "3.334",
+        "unidad_medida": "kg",
+        "categoria": "Verduras",
+        "categoria_api": "Conservas, caldos y cremas > Conservas de verdura y frutas",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/5da9e6258cbd2e45b4b84ad093cfc80b.jpg?fit=crop&h=300&w=300",
+        "keyword": "judias verdes redondas hacendado"
+      },
+      {
+        "id": "23264",
+        "nombre": "Puré de patatas Hacendado en copos",
+        "precio": 2.0,
+        "precio_por_unidad": "4.000",
+        "unidad_medida": "kg",
+        "categoria": "Verduras",
+        "categoria_api": "Conservas, caldos y cremas > Gazpacho y cremas",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/cda62d9b1f3870ff9cac3193caae188d.jpg?fit=crop&h=300&w=300",
+        "keyword": "patatas hacendado"
+      },
+      {
+        "id": "68130",
+        "nombre": "Lechuga Iceberg",
+        "precio": 1.05,
+        "precio_por_unidad": "1.050",
+        "unidad_medida": "ud",
+        "categoria": "Verduras",
+        "categoria_api": "Fruta y verdura > Lechuga y ensalada preparada",
+        "thumbnail": "https://prod-mercadona.imgix.net/images/320cf3cbed15d3543322144333ce1a98.jpg?fit=crop&h=300&w=300",
+        "keyword": "lechuga iceberg"
       }
     ]
   }
