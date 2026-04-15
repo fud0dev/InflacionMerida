@@ -1,327 +1,776 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InflaciónMérida · Controlador de precios</title>
-  <meta name="description" content="Monitor oficial de precios en Mérida. Cesta básica, higiene, mascotas y hogar. Datos reales de Mercadona actualizados diariamente." />
+  <meta name="description"
+    content="Monitor oficial de precios en Mérida. Cesta básica, higiene, mascotas y hogar. Datos reales de Mercadona actualizados diariamente." />
   <link rel="icon" type="image/png"
     href="https://merida.es/wp-content/uploads/2021/06/xcropped-favicon-32x32.png.pagespeed.ic.4twhV4Os1c.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <style>
     /* ── RESET & TOKENS ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     :root {
-      --clr-bg: #f7f7f5;
-      --clr-surface: #ffffff;
-      --clr-border: #e5e5e3;
-      --clr-text: #111111;
-      --clr-text-mid: #444444;
-      --clr-text-muted: #888888;
-      --clr-accent: #b48e4b; /* Dorado Mérida */
-      --clr-blue: #2563eb;
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --border: #e5e7eb;
+      --primary: #111827;
+      --secondary: #6b7280;
+      --accent: #b48e4b; /* Dorado Mérida */
       --clr-up: #dc2626;
       --clr-down: #16a34a;
-      --radius: 6px;
-      --shadow: 0 1px 3px rgba(0,0,0,.08);
-      --max-w: 1200px;
+      --radius: 12px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-premium: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+      --max-w: 1100px;
     }
-    body { font-family: 'Inter', sans-serif; background: var(--clr-bg); color: var(--clr-text); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
 
     /* ── HEADER ── */
-    .site-header { background: var(--clr-surface); border-bottom: 1px solid var(--clr-border); position: sticky; top: 0; z-index: 500; }
-    .header-inner { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
-    .brand { display: flex; flex-direction: column; text-decoration: none; color: inherit; line-height: 1.1; }
-    .brand-xyz { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .2em; color: var(--clr-accent); }
-    .brand-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; }
-    .brand-title em { font-style: normal; font-weight: 400; color: var(--clr-text-muted); }
+    .site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 500;
+    }
 
-    .nav-links { display: flex; gap: 1.25rem; }
-    .nav-links a { font-size: .8rem; font-weight: 600; text-decoration: none; color: var(--clr-text-muted); transition: color .2s; }
-    .nav-links a:hover { color: var(--clr-text); }
+    .header-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      line-height: 1.1;
+    }
+
+    .brand-xyz {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: var(--accent);
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .brand-title em {
+      font-style: normal;
+      font-weight: 400;
+      color: var(--secondary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .nav-links a {
+      font-size: .8rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--secondary);
+      transition: color .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
 
     /* ── HERO ── */
-    .hero { padding: 3rem 1.5rem 2rem; max-width: var(--max-w); margin: 0 auto; text-align: left; }
-    .hero-eyebrow { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .15em; color: var(--clr-text-muted); margin-bottom: .75rem; }
-    .hero-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -.04em; margin-bottom: 1rem; color: #111; }
-    .hero-desc { font-size: 1.1rem; color: var(--clr-text-mid); max-width: 650px; font-weight: 300; }
+    .hero-section {
+      padding: 3rem 1.5rem 2rem;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .hero-eyebrow {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--accent);
+      margin-bottom: .75rem;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--secondary);
+      max-width: 650px;
+      font-weight: 300;
+    }
 
     /* ── KPI GRID ── */
-    .kpi-grid { max-width: var(--max-w); margin: 0 auto 2rem; padding: 0 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
-    .kpi-card { background: var(--clr-surface); padding: 1.5rem; border: 1px solid var(--clr-border); border-radius: var(--radius); }
-    .kpi-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--clr-text-muted); margin-bottom: .25rem; }
-    .kpi-val { font-size: 1.75rem; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
-    .kpi-diff { font-size: .75rem; font-weight: 700; margin-top: .5rem; display: flex; align-items: center; gap: .3rem; }
+    .kpi-grid {
+      max-width: var(--max-w);
+      margin: 0 auto 2rem;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-premium);
+    }
+
+    .kpi-label {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--secondary);
+      margin-bottom: .25rem;
+    }
+
+    .kpi-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
+
+    .kpi-diff {
+      font-size: .75rem;
+      font-weight: 700;
+      margin-top: .5rem;
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
 
     /* ── FILTERS & SEARCH ── */
-    .controls { max-width: var(--max-w); margin: 0 auto 2rem; padding: 0 1.5rem; }
-    .search-row { position: relative; margin-bottom: 1.25rem; }
-    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--clr-text-muted); }
-    #searchInput { width: 100%; padding: 1rem 1rem 1rem 2.75rem; border: 1px solid var(--clr-border); border-radius: 8px; font-size: 1rem; outline: none; transition: border-color .2s; }
-    #searchInput:focus { border-color: var(--clr-text); box-shadow: 0 0 0 3px rgba(0,0,0,.03); }
+    .controls {
+      max-width: var(--max-w);
+      margin: 0 auto 2rem;
+      padding: 0 1.5rem;
+    }
 
-    .filter-bar { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .5rem; scrollbar-width: none; }
-    .filter-bar::-webkit-scrollbar { display: none; }
-    .filter-btn { padding: .5rem 1rem; border-radius: 20px; border: 1px solid var(--clr-border); background: var(--clr-surface); font-size: .8rem; font-weight: 600; color: var(--clr-text-mid); cursor: pointer; white-space: nowrap; transition: all .2s; }
-    .filter-btn:hover { border-color: var(--clr-text); }
-    .filter-btn.active { background: var(--clr-text); color: #fff; border-color: var(--clr-text); }
+    .search-row {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--clr-text-muted);
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 1rem 1rem 1rem 2.75rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 1rem;
+      outline: none;
+      transition: all .2s;
+      background: var(--surface);
+    }
+
+    #searchInput:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(180, 142, 75, 0.1);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: .5rem;
+      overflow-x: auto;
+      padding-bottom: .5rem;
+      scrollbar-width: none;
+    }
+
+    .filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      padding: .5rem 1.25rem;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .2s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--primary);
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
 
     /* ── SECTION TITLES ── */
-    .section-head { max-width: var(--max-w); margin: 0 auto 1.5rem; padding: 0 1.5rem; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--clr-text); padding-bottom: .75rem; }
-    .section-title { font-size: .9rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
-    .section-meta { font-size: .75rem; color: var(--clr-text-muted); font-weight: 500; }
+    .section-head {
+      max-width: var(--max-w);
+      margin: 0 auto 1.5rem;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1.5px solid var(--primary);
+      padding-bottom: .75rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .section-meta {
+      font-size: .75rem;
+      color: var(--secondary);
+      font-weight: 500;
+    }
 
     /* ── GRID/TABLE ── */
-    .main-grid { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem 4rem; display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
-    
-    .table-wrap { background: var(--clr-surface); border: 1px solid var(--clr-border); border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow); }
-    .p-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    .p-table th { background: #fafafa; padding: .75rem 1rem; text-align: left; font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--clr-text-muted); border-bottom: 1px solid var(--clr-border); }
-    .p-table td { padding: 1rem; border-bottom: 1px solid #f3f3f3; font-size: .85rem; vertical-align: middle; }
-    .p-table tr:last-child td { border-bottom: none; }
-    .p-table tbody tr { cursor: pointer; transition: background .15s; }
-    .p-table tbody tr:hover { background: #fdfdfc; }
+    .main-grid {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
 
-    .col-nombre { font-weight: 700; color: #111; width: 35%; }
-    .col-cat { width: 15%; }
-    .tag-cat { font-size: .6rem; font-weight: 700; background: #f0f0ee; color: #777; padding: .15rem .45rem; border-radius: 3px; text-transform: uppercase; }
-    .tag-grupo { font-size: .6rem; font-weight: 800; color: #fff; padding: .15rem .45rem; border-radius: 3px; text-transform: uppercase; }
-    .bg-alim { background: #16a34a; } .bg-bebi { background: #ea580c; } .bg-hogar { background: #2563eb; } .bg-masc { background: #9333ea; } .bg-higi { background: #db2777; }
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
 
-    .col-price { font-weight: 800; font-size: 1rem; text-align: right; width: 12%; }
-    .col-diff { width: 15%; text-align: center; }
-    
-    .badge-diff { display: inline-flex; align-items: center; gap: .25rem; font-size: .7rem; font-weight: 700; padding: .25rem .5rem; border-radius: 4px; }
-    .badge-diff.up { background: #fee2e2; color: var(--clr-up); }
-    .badge-diff.down { background: #dcfce7; color: var(--clr-down); }
-    .badge-diff.flat { background: #f0f0ee; color: var(--clr-text-muted); }
+    .p-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+
+    .p-table th {
+      background: #fafafa;
+      padding: .75rem 1rem;
+      text-align: left;
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .p-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f3f3;
+      font-size: .85rem;
+      vertical-align: middle;
+    }
+
+    .p-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .p-table tbody tr {
+      cursor: pointer;
+      transition: background .15s;
+    }
+
+    .p-table tbody tr:hover {
+      background: #fdfdfc;
+    }
+
+    .col-nombre {
+      font-weight: 700;
+      color: #111;
+      width: 35%;
+    }
+
+    .col-cat {
+      width: 15%;
+    }
+
+    .tag-cat {
+      font-size: .6rem;
+      font-weight: 700;
+      background: #f0f0ee;
+      color: #777;
+      padding: .15rem .45rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .tag-grupo {
+      font-size: .6rem;
+      font-weight: 800;
+      color: #fff;
+      padding: .15rem .45rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .bg-alim {
+      background: #16a34a;
+    }
+
+    .bg-bebi {
+      background: #ea580c;
+    }
+
+    .bg-hogar {
+      background: #2563eb;
+    }
+
+    .bg-masc {
+      background: #9333ea;
+    }
+
+    .bg-higi {
+      background: #db2777;
+    }
+
+    .col-price {
+      font-weight: 800;
+      font-size: 1rem;
+      text-align: right;
+      width: 12%;
+    }
+
+    .col-diff {
+      width: 15%;
+      text-align: center;
+    }
+
+    .badge-diff {
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: .25rem .5rem;
+      border-radius: 4px;
+    }
+
+    .badge-diff.up {
+      background: #fee2e2;
+      color: var(--clr-up);
+    }
+
+    .badge-diff.down {
+      background: #dcfce7;
+      color: var(--clr-down);
+    }
+
+    .badge-diff.flat {
+      background: #f0f0ee;
+      color: var(--clr-text-muted);
+    }
 
     /* ── CHART ── */
-    .chart-box { background: var(--clr-surface); border: 1px solid var(--clr-border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
-    .chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-    .chart-title { font-size: .95rem; font-weight: 800; color: #111; }
-    #prodSelect { padding: .45rem 1rem; border: 1px solid var(--clr-border); border-radius: 4px; font-size: .8rem; font-weight: 600; cursor: pointer; }
-    .chart-body { height: 320px; position: relative; }
+    .chart-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .chart-title {
+      font-size: .95rem;
+      font-weight: 800;
+      color: #111;
+    }
+
+    #prodSelect {
+      padding: .45rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--bg);
+    }
+
+    .chart-body {
+      height: 320px;
+      position: relative;
+    }
 
     /* ── FOOTER ── */
-    .footer { border-top: 1px solid var(--clr-border); padding: 3rem 1.5rem; text-align: center; background: #fff; }
-    .footer-inner { max-width: var(--max-w); margin: 0 auto; color: var(--clr-text-muted); font-size: .8rem; }
-    .footer-brand { font-size: .9rem; font-weight: 800; color: #111; margin-bottom: .5rem; display: block; }
-    .footer a { color: var(--clr-accent); font-weight: 600; text-decoration: none; }
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      background: var(--surface);
+    }
+
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      color: var(--secondary);
+      font-size: .8rem;
+    }
+
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: .5rem;
+      display: block;
+    }
+
+    .footer a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .kpi-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
       /* Mostrar grupo y variación, ocultar columna del botón para ganar espacio */
-      .p-table th:nth-child(5), .p-table td:nth-child(5) { display: none; }
-      .col-nombre { width: 40%; }
-      .col-cat { width: 20%; }
-      .col-price { width: 15%; }
-      .col-diff { width: 25%; }
-    }
-    @media (max-width: 600px) {
-      .kpi-grid { grid-template-columns: 1fr; }
-      .hero-title { font-size: 2rem; }
-      .main-grid { padding: 0 1rem 3rem; }
+      .p-table th:nth-child(5),
+      .p-table td:nth-child(5) {
+        display: none;
+      }
+
+      .col-nombre {
+        width: 40%;
+      }
+
+      .col-cat {
+        width: 20%;
+      }
+
+      .col-price {
+        width: 15%;
+      }
+
+      .col-diff {
+        width: 25%;
+      }
     }
 
-    .shimmer { animation: shimmer 2s infinite linear; background: linear-gradient(to right, #eff1f3 4%, #e2e2e2 25%, #eff1f3 36%); background-size: 1000px 100%; }
-    @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+    @media (max-width: 600px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .main-grid {
+        padding: 0 1rem 3rem;
+      }
+    }
+
+    .shimmer {
+      animation: shimmer 2s infinite linear;
+      background: linear-gradient(to right, #eff1f3 4%, #e2e2e2 25%, #eff1f3 36%);
+      background-size: 1000px 100%;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+
+      100% {
+        background-position: 1000px 0;
+      }
+    }
   </style>
 </head>
+
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a href="https://meridaxyz.wordpress.com" class="brand">
-      <span class="brand-xyz">Mérida XYZ</span>
-      <span class="brand-title">Inflación<em>Mérida</em></span>
-    </a>
-    <nav class="nav-links">
-      <a href="https://fud0dev.github.io/AgendaMerida/">Noticias</a>
-      <a href="https://fud0dev.github.io/ADMerida/">Deportes</a>
-      <a href="https://fud0dev.github.io/EmpleoMerida/">Empleo</a>
-    </nav>
-  </div>
-</header>
-
-<section class="hero">
-  <p class="hero-eyebrow">Monitor de Precios · Mérida Extra</p>
-  <h1 class="hero-title">El Pulso de tu <em>Bolsillo</em></h1>
-  <p class="hero-desc">Control diario de más de 100 productos esenciales: alimentación, bebidas, mascotas, hogar e higiene. Datos reales de la capital emeritense.</p>
-</section>
-
-<!-- KPI ROW -->
-<div class="kpi-grid" id="kpiGrid">
-  <div class="kpi-card"><div class="shimmer" style="height:60px"></div></div>
-  <div class="kpi-card"><div class="shimmer" style="height:60px"></div></div>
-  <div class="kpi-card"><div class="shimmer" style="height:60px"></div></div>
-  <div class="kpi-card"><div class="shimmer" style="height:60px"></div></div>
-</div>
-
-<div class="controls">
-  <div class="search-row">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="Busca un producto (ej: leche, cerveza, detergente...)" />
-  </div>
-  <div class="filter-bar" id="filterBar">
-    <button class="filter-btn active" data-group="ALL">Todos los productos</button>
-    <button class="filter-btn" data-group="ALIMENTACION">Alimentos</button>
-    <button class="filter-btn" data-group="BEBIDAS">Bebidas</button>
-    <button class="filter-btn" data-group="HOGAR">Hogar</button>
-    <button class="filter-btn" data-group="HIGIENE">Higiene</button>
-    <button class="filter-btn" data-group="MASCOTAS">Mascotas</button>
-  </div>
-</div>
-
-<main class="main-grid">
-  
-  <!-- CHART -->
-  <section class="chart-box">
-    <div class="chart-head">
-      <h2 class="chart-title" id="chartLabel">Evolución de Precio</h2>
-      <select id="prodSelect"><option>Cargando productos...</option></select>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="https://meridaxyz.wordpress.com" class="brand">
+        <span class="brand-xyz">Mérida XYZ</span>
+        <span class="brand-title">Inflación<em>Mérida</em></span>
+      </a>
+      <nav class="nav-links">
+        <a href="https://fud0dev.github.io/AgendaMerida/">Noticias</a>
+        <a href="https://fud0dev.github.io/ADMerida/">Deportes</a>
+        <a href="https://fud0dev.github.io/EmpleoMerida/">Empleo</a>
+      </nav>
     </div>
-    <div class="chart-body">
-      <canvas id="priceChart"></canvas>
-    </div>
+  </header>
+
+  <section class="hero-section">
+    <p class="hero-eyebrow">Monitor de Precios · Mérida XYZ</p>
+    <h1 class="hero-title">El Pulso de tu <em>Bolsillo</em></h1>
+    <p class="hero-desc">Control diario de más de 100 productos esenciales: alimentación, bebidas, mascotas, hogar e
+      higiene. Datos reales de la capital emeritense.</p>
   </section>
 
-  <!-- TABLE -->
-  <section>
-    <div class="section-head">
-      <h2 class="section-title">Índice de Precios Hoy</h2>
-      <span class="section-meta" id="updateInfo">Actualizado: --</span>
+  <!-- KPI ROW -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card">
+      <div class="shimmer" style="height:60px"></div>
     </div>
-    <div class="table-wrap">
-      <table class="p-table" id="pTable">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Grupo</th>
-            <th style="text-align:right">Precio Hoy</th>
-            <th style="text-align:center">Variación</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="pBody">
-          <tr><td colspan="5" style="text-align:center;padding:3rem">Cargando monitor de precios...</td></tr>
-        </tbody>
-      </table>
+    <div class="kpi-card">
+      <div class="shimmer" style="height:60px"></div>
     </div>
-  </section>
-
-</main>
-
-<footer class="footer">
-  <div class="footer-inner">
-    <span class="footer-brand">Mérida XYZ · InflaciónMérida</span>
-    <p>Proyecto independiente de monitorización de datos locales en Mérida (Badajoz).</p>
-    <p>© 2026 · <a href="https://github.com/fud0dev">@fud0dev</a></p>
+    <div class="kpi-card">
+      <div class="shimmer" style="height:60px"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="shimmer" style="height:60px"></div>
+    </div>
   </div>
-</footer>
 
-<script>
-/* ── JS LOGIC ── */
+  <div class="controls">
+    <div class="search-row">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Busca un producto (ej: leche, cerveza, detergente...)" />
+    </div>
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn active" data-group="ALL">Todos los productos</button>
+      <button class="filter-btn" data-group="ALIMENTACION">Alimentos</button>
+      <button class="filter-btn" data-group="BEBIDAS">Bebidas</button>
+      <button class="filter-btn" data-group="HOGAR">Hogar</button>
+      <button class="filter-btn" data-group="HIGIENE">Higiene</button>
+      <button class="filter-btn" data-group="MASCOTAS">Mascotas</button>
+    </div>
+  </div>
 
-let g_data = null;
-let g_fechas = [];
-let g_currentGroup = 'ALL';
-let g_chart = null;
+  <main class="main-grid">
 
-async function init() {
-  try {
-    const res = await fetch(`data/historico_completo.json?v=${Date.now()}`);
-    g_data = await res.json();
-    g_fechas = g_data.fechas;
-    
-    if (g_fechas.length > 0) {
-      renderDashboard();
-      setupEvents();
-      // Select first product by default for chart
-      const first = g_data.datos[g_fechas[g_fechas.length-1]][0];
-      if (first) selectForChart(first.nombre);
+    <!-- CHART -->
+    <section class="chart-box">
+      <div class="chart-head">
+        <h2 class="chart-title" id="chartLabel">Evolución de Precio</h2>
+        <select id="prodSelect">
+          <option>Cargando productos...</option>
+        </select>
+      </div>
+      <div class="chart-body">
+        <canvas id="priceChart"></canvas>
+      </div>
+    </section>
+
+    <!-- TABLE -->
+    <section>
+      <div class="section-head">
+        <h2 class="section-title">Índice de Precios Hoy</h2>
+        <span class="section-meta" id="updateInfo">Actualizado: --</span>
+      </div>
+      <div class="table-wrap">
+        <table class="p-table" id="pTable">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Grupo</th>
+              <th style="text-align:right">Precio Hoy</th>
+              <th style="text-align:center">Variación</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="pBody">
+            <tr>
+              <td colspan="5" style="text-align:center;padding:3rem">Cargando monitor de precios...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span class="footer-brand">Mérida XYZ · InflaciónMérida</span>
+      <p>Proyecto independiente de monitorización de datos locales en Mérida (Badajoz).</p>
+      <p>© 2026 · <a href="https://github.com/fud0dev">@fud0dev</a></p>
+    </div>
+  </footer>
+
+  <script>
+    /* ── JS LOGIC ── */
+
+    let g_data = null;
+    let g_fechas = [];
+    let g_currentGroup = 'ALL';
+    let g_chart = null;
+
+    async function init() {
+      try {
+        const res = await fetch(`data/historico_completo.json?v=${Date.now()}`);
+        g_data = await res.json();
+        g_fechas = g_data.fechas;
+
+        if (g_fechas.length > 0) {
+          renderDashboard();
+          setupEvents();
+          // Select first product by default for chart
+          const first = g_data.datos[g_fechas[g_fechas.length - 1]][0];
+          if (first) selectForChart(first.nombre);
+        }
+      } catch (err) {
+        console.error("Error loading data:", err);
+      }
     }
-  } catch (err) {
-    console.error("Error loading data:", err);
-  }
-}
 
-function renderDashboard() {
-  const hoyStr = g_fechas[g_fechas.length - 1];
-  const antStr = g_fechas.length > 1 ? g_fechas[g_fechas.length - 2] : null;
-  
-  const hoyData = g_data.datos[hoyStr];
-  const antData = antStr ? g_data.datos[antStr] : [];
+    function renderDashboard() {
+      const hoyStr = g_fechas[g_fechas.length - 1];
+      const antStr = g_fechas.length > 1 ? g_fechas[g_fechas.length - 2] : null;
 
-  document.getElementById('updateInfo').textContent = `Actualizado: ${fmtDate(hoyStr)}`;
+      const hoyData = g_data.datos[hoyStr];
+      const antData = antStr ? g_data.datos[antStr] : [];
 
-  // 1. KPIs
-  renderKPIs(hoyData, antData);
-  
-  // 2. Tablas
-  renderTable(hoyData, antData);
+      document.getElementById('updateInfo').textContent = `Actualizado: ${fmtDate(hoyStr)}`;
 
-  // 3. Select para gráfica
-  populateSelect(hoyData);
-}
+      // 1. KPIs
+      renderKPIs(hoyData, antData);
 
-function renderKPIs(hoy, ant) {
-  const groups = [
-    { id: 'TOTAL', name: 'Cesta Completa', filter: p => true },
-    { id: 'ALIM',  name: 'Alimentación',   filter: p => p.grupo === 'ALIMENTACION' },
-    { id: 'HOGAR', name: 'Hogar e Higiene', filter: p => ['HOGAR','HIGIENE'].includes(p.grupo) },
-    { id: 'MASC',  name: 'Mascotas',       filter: p => p.grupo === 'MASCOTAS' }
-  ];
+      // 2. Tablas
+      renderTable(hoyData, antData);
 
-  const grid = document.getElementById('kpiGrid');
-  grid.innerHTML = groups.map(g => {
-    const sumHoy = hoy.filter(g.filter).reduce((acc, p) => acc + p.precio, 0);
-    const sumAnt = ant.filter(g.filter).reduce((acc, p) => acc + p.precio, 0);
-    const diff = ant.length ? sumHoy - sumAnt : 0;
-    const diffCls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
-    const diffSym = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
+      // 3. Select para gráfica
+      populateSelect(hoyData);
+    }
 
-    return `
+    function renderKPIs(hoy, ant) {
+      const groups = [
+        { id: 'TOTAL', name: 'Cesta Completa', filter: p => true },
+        { id: 'ALIM', name: 'Alimentación', filter: p => p.grupo === 'ALIMENTACION' },
+        { id: 'HOGAR', name: 'Hogar e Higiene', filter: p => ['HOGAR', 'HIGIENE'].includes(p.grupo) },
+        { id: 'MASC', name: 'Mascotas', filter: p => p.grupo === 'MASCOTAS' }
+      ];
+
+      const grid = document.getElementById('kpiGrid');
+      grid.innerHTML = groups.map(g => {
+        const sumHoy = hoy.filter(g.filter).reduce((acc, p) => acc + p.precio, 0);
+        const sumAnt = ant.filter(g.filter).reduce((acc, p) => acc + p.precio, 0);
+        const diff = ant.length ? sumHoy - sumAnt : 0;
+        const diffCls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
+        const diffSym = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
+
+        return `
       <div class="kpi-card">
         <div class="kpi-label">${g.name}</div>
         <div class="kpi-val">${sumHoy.toFixed(2)} €</div>
         <div class="kpi-diff ${diffCls}">
-          ${diffSym} ${Math.abs(diff).toFixed(2)} € <span style="font-weight:400;color:var(--clr-text-muted)">vs ayer</span>
+          ${diffSym} ${Math.abs(diff).toFixed(2)} € <span style="font-weight:400;color:var(--secondary)">vs ayer</span>
         </div>
       </div>
     `;
-  }).join('');
-}
+      }).join('');
+    }
 
-function renderTable(hoy, ant) {
-  const body = document.getElementById('pBody');
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  
-  let filtered = hoy;
-  if (g_currentGroup !== 'ALL') {
-    filtered = filtered.filter(p => p.grupo === g_currentGroup);
-  }
-  if (query) {
-    filtered = filtered.filter(p => p.nombre.toLowerCase().includes(query) || p.categoria.toLowerCase().includes(query));
-  }
+    function renderTable(hoy, ant) {
+      const body = document.getElementById('pBody');
+      const query = document.getElementById('searchInput').value.toLowerCase();
 
-  if (filtered.length === 0) {
-    body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:3rem">No se encontraron productos.</td></tr>';
-    return;
-  }
+      let filtered = hoy;
+      if (g_currentGroup !== 'ALL') {
+        filtered = filtered.filter(p => p.grupo === g_currentGroup);
+      }
+      if (query) {
+        filtered = filtered.filter(p => p.nombre.toLowerCase().includes(query) || p.categoria.toLowerCase().includes(query));
+      }
 
-  body.innerHTML = filtered.map(p => {
-    const pAnt = ant.find(a => a.nombre === p.nombre);
-    const diff = pAnt ? p.precio - pAnt.precio : 0;
-    const badgeCls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
-    const badgeSym = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
-    const grupoCls = `tag-grupo bg-${p.grupo.substring(0,4).toLowerCase()}`;
+      if (filtered.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:3rem">No se encontraron productos.</td></tr>';
+        return;
+      }
 
-    return `
+      body.innerHTML = filtered.map(p => {
+        const pAnt = ant.find(a => a.nombre === p.nombre);
+        const diff = pAnt ? p.precio - pAnt.precio : 0;
+        const badgeCls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
+        const badgeSym = diff > 0 ? '▲' : diff < 0 ? '▼' : '=';
+        const grupoCls = `tag-grupo bg-${p.grupo.substring(0, 4).toLowerCase()}`;
+
+        return `
       <tr onclick="selectForChart('${p.nombre}')">
         <td class="col-nombre">${p.nombre}</td>
         <td class="col-cat">
@@ -337,77 +786,78 @@ function renderTable(hoy, ant) {
         </td>
       </tr>
     `;
-  }).join('');
-}
-
-function populateSelect(hoy) {
-  const sel = document.getElementById('prodSelect');
-  const sorted = [...hoy].sort((a,b) => a.nombre.localeCompare(b.nombre));
-  sel.innerHTML = sorted.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('');
-}
-
-function setupEvents() {
-  document.getElementById('searchInput').oninput = () => renderDashboard();
-  
-  document.querySelectorAll('.filter-btn[data-group]').forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      g_currentGroup = btn.dataset.group;
-      renderDashboard();
-    };
-  });
-
-  document.getElementById('prodSelect').onchange = (e) => selectForChart(e.target.value);
-}
-
-function selectForChart(nombre) {
-  document.getElementById('chartLabel').textContent = `${nombre}`;
-  document.getElementById('prodSelect').value = nombre;
-  
-  const labels = g_fechas.map(f => fmtDate(f));
-  const data = g_fechas.map(f => {
-    const p = g_data.datos[f].find(x => x.nombre === nombre);
-    return p ? p.precio : null;
-  });
-
-  if (g_chart) g_chart.destroy();
-  
-  const ctx = document.getElementById('priceChart').getContext('2d');
-  g_chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        borderColor: '#111',
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        borderWidth: 2,
-        tension: 0.3,
-        fill: true,
-        pointRadius: 4,
-        pointBackgroundColor: '#fff',
-        pointBorderColor: '#111'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { grid: { color: '#eee' }, ticks: { callback: v => v.toFixed(2) + ' €' } },
-        x: { grid: { display: false } }
-      }
+      }).join('');
     }
-  });
-}
 
-function fmtDate(iso) {
-  const [y,m,d] = iso.split('-');
-  return `${d}/${m}`;
-}
+    function populateSelect(hoy) {
+      const sel = document.getElementById('prodSelect');
+      const sorted = [...hoy].sort((a, b) => a.nombre.localeCompare(b.nombre));
+      sel.innerHTML = sorted.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('');
+    }
 
-init();
-</script>
+    function setupEvents() {
+      document.getElementById('searchInput').oninput = () => renderDashboard();
+
+      document.querySelectorAll('.filter-btn[data-group]').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          g_currentGroup = btn.dataset.group;
+          renderDashboard();
+        };
+      });
+
+      document.getElementById('prodSelect').onchange = (e) => selectForChart(e.target.value);
+    }
+
+    function selectForChart(nombre) {
+      document.getElementById('chartLabel').textContent = `${nombre}`;
+      document.getElementById('prodSelect').value = nombre;
+
+      const labels = g_fechas.map(f => fmtDate(f));
+      const data = g_fechas.map(f => {
+        const p = g_data.datos[f].find(x => x.nombre === nombre);
+        return p ? p.precio : null;
+      });
+
+      if (g_chart) g_chart.destroy();
+
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      g_chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            borderColor: '#111',
+            backgroundColor: 'rgba(0,0,0,0.05)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#111'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#eee' }, ticks: { callback: v => v.toFixed(2) + ' €' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function fmtDate(iso) {
+      const [y, m, d] = iso.split('-');
+      return `${d}/${m}`;
+    }
+
+    init();
+  </script>
 </body>
+
 </html>
