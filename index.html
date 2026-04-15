@@ -113,8 +113,12 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .kpi-grid { grid-template-columns: 1fr 1fr; }
-      .p-table th:nth-child(2), .p-table td:nth-child(2),
-      .p-table th:nth-child(4), .p-table td:nth-child(4) { display: none; }
+      /* Mostrar grupo y variación, ocultar columna del botón para ganar espacio */
+      .p-table th:nth-child(5), .p-table td:nth-child(5) { display: none; }
+      .col-nombre { width: 40%; }
+      .col-cat { width: 20%; }
+      .col-price { width: 15%; }
+      .col-diff { width: 25%; }
     }
     @media (max-width: 600px) {
       .kpi-grid { grid-template-columns: 1fr; }
